@@ -115,7 +115,7 @@ def format_message(text):
 
 def generate_avatar(username, size=100):
     random.seed(username)
-    color = (random.randint(50, 200), random.randint(50, 200), random.randint(50, 200)
+    color = (random.randint(50, 200), random.randint(50, 200), random.randint(50, 200))
     img = Image.new('RGB', (size, size), color)
     draw = ImageDraw.Draw(img)
     
@@ -157,7 +157,6 @@ def base_html(content):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHAT SITE</title>
     <style>
-        /* All CSS styles from previous example */
         :root {{
             --bg-color: #ffffff;
             --text-color: #000000;
@@ -206,7 +205,377 @@ def base_html(content):
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }}
 
-        /* ... (rest of CSS styles) ... */
+        .header h1 {{
+            margin: 0;
+            font-size: 24px;
+        }}
+
+        .nav-icons {{
+            display: flex;
+            gap: 20px;
+        }}
+
+        .nav-icons a {{
+            color: var(--header-text);
+            text-decoration: none;
+            font-size: 20px;
+        }}
+
+        .container {{
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+
+        .chat-container {{
+            display: flex;
+            height: calc(100vh - 150px);
+        }}
+
+        .sidebar {{
+            width: 250px;
+            border-right: 1px solid var(--separator-color);
+            padding-right: 15px;
+            overflow-y: auto;
+        }}
+
+        .chat-area {{
+            flex: 1;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+        }}
+
+        .messages {{
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }}
+
+        .message-container {{
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }}
+
+        .message-header {{
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }}
+
+        .message-content {{
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }}
+
+        .message-time {{
+            color: #666;
+            font-size: 12px;
+            text-align: right;
+        }}
+
+        .message-edited {{
+            color: #666;
+            font-size: 12px;
+            font-style: italic;
+            display: inline-block;
+            margin-left: 5px;
+        }}
+
+        .separator {{
+            height: 15px;
+        }}
+
+        .input-area {{
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+        }}
+
+        .message-input {{
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 20px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            resize: none;
+        }}
+
+        .send-button {{
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }}
+
+        .send-button:hover {{
+            background-color: var(--button-hover);
+        }}
+
+        .formatting-buttons {{
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }}
+
+        .format-button {{
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }}
+
+        .login-container, .register-container {{
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: var(--msg-bubble);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }}
+
+        .form-group {{
+            margin-bottom: 20px;
+        }}
+
+        .form-group label {{
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }}
+
+        .form-group input {{
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }}
+
+        .form-submit {{
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }}
+
+        .form-submit:hover {{
+            background-color: var(--button-hover);
+        }}
+
+        .form-footer {{
+            margin-top: 20px;
+            text-align: center;
+        }}
+
+        .form-footer a {{
+            color: var(--link-color);
+            text-decoration: none;
+        }}
+
+        .error-message {{
+            color: var(--error-color);
+            margin-top: 5px;
+            font-size: 14px;
+        }}
+
+        .profile-container {{
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--msg-bubble);
+            border-radius: 10px;
+        }}
+
+        .profile-header {{
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }}
+
+        .profile-pic {{
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }}
+
+        .profile-username {{
+            font-size: 24px;
+            margin: 0;
+        }}
+
+        .profile-email {{
+            color: #666;
+            margin: 5px 0 0;
+        }}
+
+        .settings-form {{
+            margin-top: 20px;
+        }}
+
+        .settings-option {{
+            margin-bottom: 20px;
+        }}
+
+        .settings-option label {{
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }}
+
+        .settings-actions {{
+            margin-top: 30px;
+        }}
+
+        .theme-toggle {{
+            display: flex;
+            align-items: center;
+        }}
+
+        .theme-toggle label {{
+            margin-left: 10px;
+        }}
+
+        .switch {{
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }}
+
+        .switch input {{
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }}
+
+        .slider {{
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }}
+
+        .slider:before {{
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }}
+
+        input:checked + .slider {{
+            background-color: var(--button-bg);
+        }}
+
+        input:checked + .slider:before {{
+            transform: translateX(26px);
+        }}
+
+        .info-container {{
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--msg-bubble);
+            border-radius: 10px;
+        }}
+
+        .info-container h2 {{
+            margin-top: 0;
+        }}
+
+        .user-list {{
+            list-style: none;
+            padding: 0;
+        }}
+
+        .user-item {{
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--separator-color);
+        }}
+
+        .user-item:last-child {{
+            border-bottom: none;
+        }}
+
+        .user-pic {{
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }}
+
+        .user-name {{
+            font-weight: bold;
+        }}
+
+        .start-chat {{
+            margin-left: auto;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }}
+
+        .start-chat:hover {{
+            background-color: var(--button-hover);
+        }}
+
+        @media (max-width: 768px) {{
+            .chat-container {{
+                flex-direction: column;
+                height: auto;
+            }}
+
+            .sidebar {{
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--separator-color);
+                padding-right: 0;
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+            }}
+
+            .chat-area {{
+                padding-left: 0;
+            }}
+        }}
 
         .avatar {{
             width: 40px;
@@ -298,6 +667,21 @@ def base_html(content):
                 const index = username.charCodeAt(0) % colors.length;
                 return colors[index];
             }}
+            
+            // Auto-scroll to bottom of messages
+            const messagesDiv = document.getElementById('messages');
+            if (messagesDiv) {{
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }}
+            
+            // Auto-resize textarea
+            const textarea = document.querySelector('.message-input');
+            if (textarea) {{
+                textarea.addEventListener('input', function() {{
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                }});
+            }}
         }});
     </script>
 </body>
@@ -354,7 +738,12 @@ def index():
                     <div class="message-content">{msg['content']}</div>
                     <div class="message-time">{msg['timestamp']}</div>
                 </div>
-                ''' for msg in messages)}
+                {'<div class="separator"></div>' if i < len(messages)-1 else ''}
+                ''' for i, msg in enumerate(messages))}
+            </div>
+            <div class="formatting-buttons">
+                <button type="button" class="format-button" id="bold-btn">Bold</button>
+                <button type="button" class="format-button" id="italic-btn">Italic</button>
             </div>
             <div class="input-area">
                 <textarea class="message-input" id="message-input" placeholder="Type your message..."></textarea>
@@ -617,6 +1006,7 @@ def info():
             <li>User profiles with dynamic avatars</li>
             <li>Light/dark mode toggle</li>
             <li>Basic text formatting (bold, italic)</li>
+            <li>No page reload for messaging</li>
         </ul>
         
         <h3>How to Use</h3>
@@ -631,6 +1021,7 @@ def info():
             <li>Vanilla HTML/CSS/JavaScript frontend</li>
             <li>JSON-based data storage</li>
             <li>Dynamic avatar generation</li>
+            <li>AJAX for seamless messaging</li>
         </ul>
     </div>
     """
