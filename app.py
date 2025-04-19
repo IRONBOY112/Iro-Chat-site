@@ -148,8 +148,17 @@ def format_time_filter(timestamp):
     except:
         return timestamp
 
-# HTML Templates
-BASE_HTML = """
+def format_message(text):
+    # Simple formatting for bold and italic
+    text = text.replace('**', '<strong>', 1)
+    text = text.replace('**', '</strong>', 1)
+    text = text.replace('*', '<em>', 1)
+    text = text.replace('*', '</em>', 1)
+    return text
+
+# Common HTML structure
+def wrap_page(content, current_user=None):
+    return f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,7 +166,7 @@ BASE_HTML = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHAT SITE</title>
     <style>
-        :root {
+        :root {{
             --bg-color: #ffffff;
             --text-color: #000000;
             --msg-bubble: #f1f1f1;
@@ -171,9 +180,9 @@ BASE_HTML = """
             --link-color: #4a76a8;
             --error-color: #ff3333;
             --separator-color: #eee;
-        }
+        }}
 
-        .dark-mode {
+        .dark-mode {{
             --bg-color: #1a1a1a;
             --text-color: #ffffff;
             --msg-bubble: #333333;
@@ -184,18 +193,18 @@ BASE_HTML = """
             --button-hover: #1a2636;
             --link-color: #4a90e2;
             --separator-color: #444;
-        }
+        }}
 
-        body {
+        body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
-        }
+        }}
 
-        .header {
+        .header {{
             background-color: var(--header-bg);
             color: var(--header-text);
             padding: 15px 20px;
@@ -203,95 +212,94 @@ BASE_HTML = """
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+        }}
 
-        .header h1 {
+        .header h1 {{
             margin: 0;
             font-size: 24px;
-        }
+        }}
 
-        .nav-icons {
+        .nav-icons {{
             display: flex;
             gap: 20px;
-        }
+        }}
 
-        .nav-icons a {
+        .nav-icons a {{
             color: var(--header-text);
             text-decoration: none;
             font-size: 20px;
-        }
+        }}
 
-        .container {
+        .container {{
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-        }
+        }}
 
-        .chat-container {
+        .chat-container {{
             display: flex;
             height: calc(100vh - 150px);
-        }
+        }}
 
-        .sidebar {
+        .sidebar {{
             width: 250px;
             border-right: 1px solid var(--separator-color);
             padding-right: 15px;
             overflow-y: auto;
-        }
+        }}
 
-        .chat-area {
+        .chat-area {{
             flex: 1;
             padding-left: 20px;
             display: flex;
             flex-direction: column;
-        }
+        }}
 
-        .messages {
+        .messages {{
             flex: 1;
             overflow-y: auto;
             margin-bottom: 15px;
-        }
+        }}
 
-        /* Updated Message Styles to Match Screenshot */
-        .message-container {
+        .message-container {{
             margin-bottom: 20px;
             padding: 0 10px;
-        }
+        }}
 
-        .message-header {
+        .message-header {{
             font-weight: bold;
             margin-bottom: 4px;
-        }
+        }}
 
-        .message-content {
+        .message-content {{
             margin-bottom: 4px;
-        }
+        }}
 
-        .message-time {
+        .message-time {{
             color: #666;
             font-size: 12px;
             text-align: right;
-        }
+        }}
 
-        .message-edited {
+        .message-edited {{
             color: #666;
             font-size: 12px;
             font-style: italic;
             display: inline-block;
             margin-left: 5px;
-        }
+        }}
 
-        .separator {
+        .separator {{
             height: 15px;
-        }
+        }}
 
-        .input-area {
+        .input-area {{
             display: flex;
             gap: 10px;
             padding: 10px 0;
-        }
+        }}
 
-        .message-input {
+        .message-input {{
             flex: 1;
             padding: 12px 15px;
             border: 1px solid var(--input-border);
@@ -300,9 +308,9 @@ BASE_HTML = """
             color: var(--text-color);
             font-size: 16px;
             resize: none;
-        }
+        }}
 
-        .send-button {
+        .send-button {{
             background-color: var(--button-bg);
             color: var(--button-text);
             border: none;
@@ -311,19 +319,19 @@ BASE_HTML = """
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.2s;
-        }
+        }}
 
-        .send-button:hover {
+        .send-button:hover {{
             background-color: var(--button-hover);
-        }
+        }}
 
-        .formatting-buttons {
+        .formatting-buttons {{
             display: flex;
             gap: 5px;
             margin-bottom: 10px;
-        }
+        }}
 
-        .format-button {
+        .format-button {{
             background-color: var(--button-bg);
             color: var(--button-text);
             border: none;
@@ -331,37 +339,37 @@ BASE_HTML = """
             padding: 5px 10px;
             cursor: pointer;
             font-size: 14px;
-        }
+        }}
 
-        .login-container, .register-container {
+        .login-container, .register-container {{
             max-width: 400px;
             margin: 50px auto;
             padding: 30px;
             background-color: var(--msg-bubble);
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+        }}
 
-        .form-group {
+        .form-group {{
             margin-bottom: 20px;
-        }
+        }}
 
-        .form-group label {
+        .form-group label {{
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-        }
+        }}
 
-        .form-group input {
+        .form-group input {{
             width: 100%;
             padding: 10px;
             border: 1px solid var(--input-border);
             border-radius: 4px;
             background-color: var(--input-bg);
             color: var(--text-color);
-        }
+        }}
 
-        .form-submit {
+        .form-submit {{
             background-color: var(--button-bg);
             color: var(--button-text);
             border: none;
@@ -370,101 +378,101 @@ BASE_HTML = """
             cursor: pointer;
             font-size: 16px;
             width: 100%;
-        }
+        }}
 
-        .form-submit:hover {
+        .form-submit:hover {{
             background-color: var(--button-hover);
-        }
+        }}
 
-        .form-footer {
+        .form-footer {{
             margin-top: 20px;
             text-align: center;
-        }
+        }}
 
-        .form-footer a {
+        .form-footer a {{
             color: var(--link-color);
             text-decoration: none;
-        }
+        }}
 
-        .error-message {
+        .error-message {{
             color: var(--error-color);
             margin-top: 5px;
             font-size: 14px;
-        }
+        }}
 
-        .profile-container {
+        .profile-container {{
             max-width: 600px;
             margin: 30px auto;
             padding: 30px;
             background-color: var(--msg-bubble);
             border-radius: 10px;
-        }
+        }}
 
-        .profile-header {
+        .profile-header {{
             display: flex;
             align-items: center;
             margin-bottom: 30px;
-        }
+        }}
 
-        .profile-pic {
+        .profile-pic {{
             width: 100px;
             height: 100px;
             border-radius: 50%;
             object-fit: cover;
             margin-right: 20px;
-        }
+        }}
 
-        .profile-username {
+        .profile-username {{
             font-size: 24px;
             margin: 0;
-        }
+        }}
 
-        .profile-email {
+        .profile-email {{
             color: #666;
             margin: 5px 0 0;
-        }
+        }}
 
-        .settings-form {
+        .settings-form {{
             margin-top: 20px;
-        }
+        }}
 
-        .settings-option {
+        .settings-option {{
             margin-bottom: 20px;
-        }
+        }}
 
-        .settings-option label {
+        .settings-option label {{
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-        }
+        }}
 
-        .settings-actions {
+        .settings-actions {{
             margin-top: 30px;
-        }
+        }}
 
-        .theme-toggle {
+        .theme-toggle {{
             display: flex;
             align-items: center;
-        }
+        }}
 
-        .theme-toggle label {
+        .theme-toggle label {{
             margin-left: 10px;
-        }
+        }}
 
-        .switch {
+        .switch {{
             position: relative;
             display: inline-block;
             width: 60px;
             height: 34px;
-        }
+        }}
 
-        .switch input {
+        .switch input {{
             opacity: 0;
             width: 0;
             height: 0;
-        }
+        }}
 
-        .slider {
+        .slider {{
             position: absolute;
             cursor: pointer;
             top: 0;
@@ -474,9 +482,9 @@ BASE_HTML = """
             background-color: #ccc;
             transition: .4s;
             border-radius: 34px;
-        }
+        }}
 
-        .slider:before {
+        .slider:before {{
             position: absolute;
             content: "";
             height: 26px;
@@ -486,57 +494,57 @@ BASE_HTML = """
             background-color: white;
             transition: .4s;
             border-radius: 50%;
-        }
+        }}
 
-        input:checked + .slider {
+        input:checked + .slider {{
             background-color: var(--button-bg);
-        }
+        }}
 
-        input:checked + .slider:before {
+        input:checked + .slider:before {{
             transform: translateX(26px);
-        }
+        }}
 
-        .info-container {
+        .info-container {{
             max-width: 800px;
             margin: 30px auto;
             padding: 30px;
             background-color: var(--msg-bubble);
             border-radius: 10px;
-        }
+        }}
 
-        .info-container h2 {
+        .info-container h2 {{
             margin-top: 0;
-        }
+        }}
 
-        .user-list {
+        .user-list {{
             list-style: none;
             padding: 0;
-        }
+        }}
 
-        .user-item {
+        .user-item {{
             display: flex;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid var(--separator-color);
-        }
+        }}
 
-        .user-item:last-child {
+        .user-item:last-child {{
             border-bottom: none;
-        }
+        }}
 
-        .user-pic {
+        .user-pic {{
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
             margin-right: 15px;
-        }
+        }}
 
-        .user-name {
+        .user-name {{
             font-weight: bold;
-        }
+        }}
 
-        .start-chat {
+        .start-chat {{
             margin-left: auto;
             background-color: var(--button-bg);
             color: var(--button-text);
@@ -544,58 +552,54 @@ BASE_HTML = """
             border-radius: 4px;
             padding: 5px 10px;
             cursor: pointer;
-        }
+        }}
 
-        .start-chat:hover {
+        .start-chat:hover {{
             background-color: var(--button-hover);
-        }
+        }}
 
-        @media (max-width: 768px) {
-            .chat-container {
+        @media (max-width: 768px) {{
+            .chat-container {{
                 flex-direction: column;
                 height: auto;
-            }
+            }}
 
-            .sidebar {
+            .sidebar {{
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--separator-color);
                 padding-right: 0;
                 margin-bottom: 20px;
                 padding-bottom: 20px;
-            }
+            }}
 
-            .chat-area {
+            .chat-area {{
                 padding-left: 0;
-            }
-        }
+            }}
+        }}
     </style>
 </head>
-<body class="{{ 'dark-mode' if session.get('dark_mode', False) else '' }}">
+<body class="{'dark-mode' if session.get('dark_mode', False) else ''}">
     <div class="header">
         <h1>CHAT SITE</h1>
         <div class="nav-icons">
-            <a href="{{ url_for('index') }}" title="Home">🏠</a>
-            <a href="{{ url_for('settings') }}" title="Settings">⚙️</a>
-            <a href="{{ url_for('info') }}" title="Info">ℹ️</a>
-            {% if 'email' in session %}
-                <a href="{{ url_for('logout') }}" title="Logout">🚪</a>
-            {% else %}
-                <a href="{{ url_for('login') }}" title="Login">🔑</a>
-            {% endif %}
+            <a href="/" title="Home">🏠</a>
+            <a href="/settings" title="Settings">⚙️</a>
+            <a href="/info" title="Info">ℹ️</a>
+            {'<a href="/logout" title="Logout">🚪</a>' if 'email' in session else '<a href="/login" title="Login">🔑</a>'}
         </div>
     </div>
 
     <div class="container">
-        {% block content %}{% endblock %}
+        {content}
     </div>
 
     <script>
         // Apply saved theme preference
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {{
             // Formatting buttons functionality
-            document.querySelectorAll('.format-button').forEach(button => {
-                button.addEventListener('click', function() {
+            document.querySelectorAll('.format-button').forEach(button => {{
+                button.addEventListener('click', function() {{
                     const textarea = document.querySelector('.message-input');
                     const start = textarea.selectionStart;
                     const end = textarea.selectionEnd;
@@ -603,179 +607,131 @@ BASE_HTML = """
                     const beforeText = textarea.value.substring(0, start);
                     const afterText = textarea.value.substring(end);
 
-                    if (this.id === 'bold-btn') {
+                    if (this.id === 'bold-btn') {{
                         textarea.value = beforeText + '**' + selectedText + '**' + afterText;
-                    } else if (this.id === 'italic-btn') {
+                    }} else if (this.id === 'italic-btn') {{
                         textarea.value = beforeText + '*' + selectedText + '*' + afterText;
-                    }
+                    }}
 
                     textarea.focus();
                     textarea.selectionStart = start + (this.id === 'bold-btn' ? 2 : 1);
                     textarea.selectionEnd = end + (this.id === 'bold-btn' ? 2 : 1);
-                });
-            });
+                }});
+            }});
 
             // Auto-resize textarea
             const textarea = document.querySelector('.message-input');
-            if (textarea) {
-                textarea.addEventListener('input', function() {
+            if (textarea) {{
+                textarea.addEventListener('input', function() {{
                     this.style.height = 'auto';
                     this.style.height = (this.scrollHeight) + 'px';
-                });
-            }
+                }});
+            }}
 
             // Theme toggle
             const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('change', function() {
+            if (themeToggle) {{
+                themeToggle.addEventListener('change', function() {{
                     document.body.classList.toggle('dark-mode');
-                    fetch('/toggle-theme', {
+                    fetch('/toggle-theme', {{
                         method: 'POST',
-                        headers: {
+                        headers: {{
                             'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({dark_mode: this.checked})
-                    });
-                });
-            }
+                        }},
+                        body: JSON.stringify({{dark_mode: this.checked}})
+                    }});
+                }});
+            }}
 
             // Auto-scroll to bottom of messages
             const messagesDiv = document.getElementById('messages');
-            if (messagesDiv) {
+            if (messagesDiv) {{
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }
-        });
+            }}
+        }});
 
-        function sendMessage() {
+        function sendMessage() {{
             const input = document.getElementById('message-input');
             const message = input.value.trim();
             
-            if (message) {
-                fetch('/send-message', {
+            if (message) {{
+                fetch('/send-message', {{
                     method: 'POST',
-                    headers: {
+                    headers: {{
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
+                    }},
+                    body: JSON.stringify({{
                         content: message,
                         is_private: false,
                         recipient: null
-                    })
-                }).then(response => {
-                    if (response.ok) {
+                    }})
+                }}).then(response => {{
+                    if (response.ok) {{
                         input.value = '';
                         location.reload();
-                    }
-                });
-            }
-        }
+                    }}
+                }});
+            }}
+        }}
         
-        function startPrivateChat(email) {
+        function startPrivateChat(email) {{
             // In a real app, you would navigate to a private chat view
             alert('Starting private chat with user: ' + email);
             // For this demo, we'll just show an alert
-        }
+        }}
     </script>
 </body>
 </html>
 """
 
-LOGIN_HTML = """
-{% extends "base.html" %}
-{% block content %}
-<div class="login-container">
-    <h2>Login</h2>
-    <form action="{{ url_for('login') }}" method="POST">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        {% if error %}
-        <div class="error-message">{{ error }}</div>
-        {% endif %}
-        <button type="submit" class="form-submit">Login</button>
-    </form>
-    <div class="form-footer">
-        Don't have an account? <a href="{{ url_for('register') }}">Register</a>
-    </div>
-</div>
-{% endblock %}
-"""
-
-REGISTER_HTML = """
-{% extends "base.html" %}
-{% block content %}
-<div class="register-container">
-    <h2>Register</h2>
-    <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="profile_pic">Profile Picture (optional)</label>
-            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
-        </div>
-        {% if error %}
-        <div class="error-message">{{ error }}</div>
-        {% endif %}
-        <button type="submit" class="form-submit">Register</button>
-    </form>
-    <div class="form-footer">
-        Already have an account? <a href="{{ url_for('login') }}">Login</a>
-    </div>
-</div>
-{% endblock %}
-"""
-
-INDEX_HTML = """
-{% extends "base.html" %}
-{% block content %}
+# Routes
+@app.route('/')
+def index():
+    if 'email' not in session:
+        return redirect('/login')
+    
+    current_user = get_user_by_email(session['email'])
+    if not current_user:
+        session.clear()
+        return redirect('/login')
+    
+    with open('data/users.json', 'r') as f:
+        users = json.load(f)['users']
+    
+    messages = get_public_messages()
+    for message in messages:
+        user = get_user_by_email(message['author'])
+        message['author'] = user['username'] if user else 'Unknown'
+        message['content'] = format_message(message['content'])
+    
+    content = f"""
 <div class="chat-container">
     <div class="sidebar">
         <h3>Online Users</h3>
         <ul class="user-list">
-            {% for user in users %}
-                {% if user.email != session.email %}
-                <li class="user-item">
-                    <img src="{{ user.profile.avatar }}" alt="{{ user.username }}" class="user-pic">
-                    <span class="user-name">{{ user.username }}</span>
-                    <button class="start-chat" onclick="startPrivateChat('{{ user.email }}')">Chat</button>
-                </li>
-                {% endif %}
-            {% endfor %}
+            {' '.join([f'''
+            <li class="user-item">
+                <img src="{user['profile']['avatar']}" alt="{user['username']}" class="user-pic">
+                <span class="user-name">{user['username']}</span>
+                <button class="start-chat" onclick="startPrivateChat('{user['email']}')">Chat</button>
+            </li>
+            ''' for user in users if user['email'] != session['email']])}
         </ul>
     </div>
     
     <div class="chat-area">
         <div class="messages" id="messages">
-            {% for message in messages %}
+            {' '.join([f'''
             <div class="message-container">
                 <div class="message-header">
-                    {{ message.author }}
-                    {% if message.edited %}
-                    <span class="message-edited">Edited</span>
-                    {% endif %}
+                    {message['author']}
+                    {'<span class="message-edited">Edited</span>' if message['edited'] else ''}
                 </div>
-                <div class="message-content">{{ message.content|safe }}</div>
-                <div class="message-time">{{ message.timestamp|format_time }}</div>
+                <div class="message-content">{message['content']}</div>
+                <div class="message-time">{message['timestamp']|format_time}</div>
             </div>
-            {% if not loop.last %}
-            <div class="separator"></div>
-            {% endif %}
-            {% endfor %}
+            {'<div class="separator"></div>' if not loop.last else ''}
+            ''' for message in messages])}
         </div>
         
         <div class="formatting-buttons">
@@ -789,106 +745,13 @@ INDEX_HTML = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
-
-SETTINGS_HTML = """
-{% extends "base.html" %}
-{% block content %}
-<div class="profile-container">
-    <div class="profile-header">
-        <img src="{{ current_user.profile.avatar }}" alt="{{ current_user.username }}" class="profile-pic">
-        <div>
-            <h2 class="profile-username">{{ current_user.username }}</h2>
-            <p class="profile-email">{{ current_user.email }}</p>
-        </div>
-    </div>
-    
-    <form class="settings-form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
-        <div class="settings-option">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="{{ current_user.username }}" required>
-        </div>
-        
-        <div class="settings-option">
-            <label for="profile_pic">Profile Picture</label>
-            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
-        </div>
-        
-        <div class="settings-option theme-toggle">
-            <label>Dark Mode</label>
-            <label class="switch">
-                <input type="checkbox" id="theme-toggle" {% if session.get('dark_mode', False) %}checked{% endif %}>
-                <span class="slider"></span>
-            </label>
-        </div>
-        
-        <div class="settings-actions">
-            <button type="submit" class="form-submit">Save Changes</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
-"""
-
-INFO_HTML = """
-{% extends "base.html" %}
-{% block content %}
-<div class="info-container">
-    <h2>About CHAT SITE</h2>
-    <p>Welcome to CHAT SITE, a simple chat application built with Flask.</p>
-    
-    <h3>Features</h3>
-    <ul>
-        <li>Public chat room for all users</li>
-        <li>Private messaging between users</li>
-        <li>User profiles with avatars</li>
-        <li>Light/dark mode toggle</li>
-        <li>Basic text formatting (bold, italic)</li>
-    </ul>
-    
-    <h3>How to Use</h3>
-    <p>1. Register an account or login if you already have one</p>
-    <p>2. Join the public chat or start a private conversation</p>
-    <p>3. Customize your profile in the settings</p>
-    
-    <h3>Technical Details</h3>
-    <p>This application is built with:</p>
-    <ul>
-        <li>Python Flask backend</li>
-        <li>Vanilla HTML/CSS/JavaScript frontend</li>
-        <li>JSON-based data storage</li>
-    </ul>
-</div>
-{% endblock %}
-"""
-
-# Routes
-@app.route('/')
-def index():
-    if 'email' not in session:
-        return redirect(url_for('login'))
-    
-    current_user = get_user_by_email(session['email'])
-    if not current_user:
-        session.clear()
-        return redirect(url_for('login'))
-    
-    with open('data/users.json', 'r') as f:
-        users = json.load(f)['users']
-    
-    messages = get_public_messages()
-    for message in messages:
-        user = get_user_by_email(message['author'])
-        message['author'] = user['username'] if user else 'Unknown'
-        message['content'] = format_message(message['content'])
-    
-    return render_template_string(INDEX_HTML, users=users, messages=messages, current_user=current_user)
+    return render_template_string(wrap_page(content, current_user))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'email' in session:
-        return redirect(url_for('index'))
+        return redirect('/')
     
     error = None
     if request.method == 'POST':
@@ -902,14 +765,34 @@ def login():
             session['email'] = email
             session['username'] = user['username']
             session['dark_mode'] = user['settings']['dark_mode']
-            return redirect(url_for('index'))
+            return redirect('/')
     
-    return render_template_string(LOGIN_HTML, error=error)
+    content = f"""
+<div class="login-container">
+    <h2>Login</h2>
+    <form action="/login" method="POST">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        {'<div class="error-message">' + error + '</div>' if error else ''}
+        <button type="submit" class="form-submit">Login</button>
+    </form>
+    <div class="form-footer">
+        Don't have an account? <a href="/register">Register</a>
+    </div>
+</div>
+"""
+    return render_template_string(wrap_page(content))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if 'email' in session:
-        return redirect(url_for('index'))
+        return redirect('/')
     
     error = None
     if request.method == 'POST':
@@ -952,37 +835,100 @@ def register():
                 save_user(new_user)
                 session['email'] = email
                 session['username'] = username
-                return redirect(url_for('index'))
+                return redirect('/')
     
-    return render_template_string(REGISTER_HTML, error=error)
+    content = f"""
+<div class="register-container">
+    <h2>Register</h2>
+    <form action="/register" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="profile_pic">Profile Picture (optional)</label>
+            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+        </div>
+        {'<div class="error-message">' + error + '</div>' if error else ''}
+        <button type="submit" class="form-submit">Register</button>
+    </form>
+    <div class="form-footer">
+        Already have an account? <a href="/login">Login</a>
+    </div>
+</div>
+"""
+    return render_template_string(wrap_page(content))
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect('/login')
 
 @app.route('/settings')
 def settings():
     if 'email' not in session:
-        return redirect(url_for('login'))
+        return redirect('/login')
     
     current_user = get_user_by_email(session['email'])
     if not current_user:
         session.clear()
-        return redirect(url_for('login'))
+        return redirect('/login')
     
-    return render_template_string(SETTINGS_HTML, current_user=current_user)
+    content = f"""
+<div class="profile-container">
+    <div class="profile-header">
+        <img src="{current_user['profile']['avatar']}" alt="{current_user['username']}" class="profile-pic">
+        <div>
+            <h2 class="profile-username">{current_user['username']}</h2>
+            <p class="profile-email">{current_user['email']}</p>
+        </div>
+    </div>
+    
+    <form class="settings-form" action="/update-profile" method="POST" enctype="multipart/form-data">
+        <div class="settings-option">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{current_user['username']}" required>
+        </div>
+        
+        <div class="settings-option">
+            <label for="profile_pic">Profile Picture</label>
+            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+        </div>
+        
+        <div class="settings-option theme-toggle">
+            <label>Dark Mode</label>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle" {'checked' if session.get('dark_mode', False) else ''}>
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="settings-actions">
+            <button type="submit" class="form-submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+"""
+    return render_template_string(wrap_page(content, current_user))
 
 @app.route('/update-profile', methods=['POST'])
 def update_profile():
     if 'email' not in session:
-        return redirect(url_for('login'))
+        return redirect('/login')
     
     current_email = session['email']
     current_user = get_user_by_email(current_email)
     if not current_user:
         session.clear()
-        return redirect(url_for('login'))
+        return redirect('/login')
     
     username = request.form.get('username')
     profile_pic = request.files.get('profile_pic')
@@ -1020,7 +966,7 @@ def update_profile():
     
     update_user(current_email, updated_user)
     session['username'] = username
-    return redirect(url_for('settings'))
+    return redirect('/settings')
 
 @app.route('/toggle-theme', methods=['POST'])
 def toggle_theme():
@@ -1049,8 +995,37 @@ def toggle_theme():
 @app.route('/info')
 def info():
     if 'email' not in session:
-        return redirect(url_for('login'))
-    return render_template_string(INFO_HTML)
+        return redirect('/login')
+    
+    content = """
+<div class="info-container">
+    <h2>About CHAT SITE</h2>
+    <p>Welcome to CHAT SITE, a simple chat application built with Flask.</p>
+    
+    <h3>Features</h3>
+    <ul>
+        <li>Public chat room for all users</li>
+        <li>Private messaging between users</li>
+        <li>User profiles with avatars</li>
+        <li>Light/dark mode toggle</li>
+        <li>Basic text formatting (bold, italic)</li>
+    </ul>
+    
+    <h3>How to Use</h3>
+    <p>1. Register an account or login if you already have one</p>
+    <p>2. Join the public chat or start a private conversation</p>
+    <p>3. Customize your profile in the settings</p>
+    
+    <h3>Technical Details</h3>
+    <p>This application is built with:</p>
+    <ul>
+        <li>Python Flask backend</li>
+        <li>Vanilla HTML/CSS/JavaScript frontend</li>
+        <li>JSON-based data storage</li>
+    </ul>
+</div>
+"""
+    return render_template_string(wrap_page(content))
 
 @app.route('/pfp/<filename>')
 def serve_pfp(filename):
@@ -1087,14 +1062,6 @@ def send_message():
         add_public_message(message)
     
     return jsonify({'status': 'success'})
-
-def format_message(text):
-    # Simple formatting for bold and italic
-    text = text.replace('**', '<strong>', 1)
-    text = text.replace('**', '</strong>', 1)
-    text = text.replace('*', '<em>', 1)
-    text = text.replace('*', '</em>', 1)
-    return text
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
