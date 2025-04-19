@@ -90,58 +90,7 @@ def add_public_message(message):
         json.dump(data, f, indent=2)
         f.truncate()
 
-def update_public_message(message_id, new_content):
-    with open('data/msgs.json', 'r+') as f:
-        data = json.load(f)
-        
-        for message in data['messages']:
-            if message['id'] == message_id:
-                message['content'] = new_content
-                message['edited'] = True
-                break
-        
-        f.seek(0)
-        json.dump(data, f, indent=2)
-        f.truncate()
-
-def delete_public_message(message_id):
-    with open('data/msgs.json', 'r+') as f:
-        data = json.load(f)
-        data['messages'] = [msg for msg in data['messages'] if msg['id'] != message_id]
-        f.seek(0)
-        json.dump(data, f, indent=2)
-        f.truncate()
-
-def get_private_messages(user1, user2):
-    participants = sorted([user1, user2])
-    filename = f"data/private_msgs/{participants[0]}-{participants[1]}.json"
-    
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
-            return json.load(f)['messages']
-    return []
-
-def add_private_message(user1, user2, message):
-    participants = sorted([user1, user2])
-    filename = f"data/private_msgs/{participants[0]}-{participants[1]}.json"
-    
-    if os.path.exists(filename):
-        with open(filename, 'r+') as f:
-            data = json.load(f)
-            data['messages'].append(message)
-            f.seek(0)
-            json.dump(data, f, indent=2)
-            f.truncate()
-    else:
-        with open(filename, 'w') as f:
-            json.dump({
-                'participants': participants,
-                'messages': [message]
-            }, f, indent=2)
-
-# Custom template filter for time formatting
-@app.template_filter('format_time')
-def format_time_filter(timestamp):
+def format_time(timestamp):
     try:
         dt = datetime.fromisoformat(timestamp)
         return dt.strftime("%I:%M %p").lower().replace(" 0", " ")
@@ -156,8 +105,8 @@ def format_message(text):
     text = text.replace('*', '</em>', 1)
     return text
 
-# Common HTML structure
-def wrap_page(content, current_user=None):
+# HTML Templates
+def base_html(content):
     return f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -166,6 +115,7 @@ def wrap_page(content, current_user=None):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHAT SITE</title>
     <style>
+        /* All your CSS styles here */
         :root {{
             --bg-color: #ffffff;
             --text-color: #000000;
@@ -195,6 +145,7 @@ def wrap_page(content, current_user=None):
             --separator-color: #444;
         }}
 
+        /* Rest of your CSS styles */
         body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -595,8 +546,10 @@ def wrap_page(content, current_user=None):
     </div>
 
     <script>
-        // Apply saved theme preference
+        // Format message timestamps on page load
         document.addEventListener('DOMContentLoaded', function() {{
+            formatTimestamps();
+            
             // Formatting buttons functionality
             document.querySelectorAll('.format-button').forEach(button => {{
                 button.addEventListener('click', function() {{
@@ -650,9 +603,25 @@ def wrap_page(content, current_user=None):
             }}
         }});
 
+        function formatTimestamps() {{
+            document.querySelectorAll('.message-time').forEach(el => {{
+                const rawTime = el.textContent.trim();
+                if (rawTime) {{
+                    try {{
+                        const date = new Date(rawTime);
+                        const formatted = date.toLocaleTimeString([], {{hour: '2-digit', minute:'2-digit'}}).toLowerCase();
+                        el.textContent = formatted;
+                    }} catch (e) {{
+                        console.error('Error formatting time:', e);
+                    }}
+                }}
+            }});
+        }}
+
         function sendMessage() {{
             const input = document.getElementById('message-input');
             const message = input.value.trim();
+            const messagesDiv = document.getElementById('messages');
             
             if (message) {{
                 fetch('/send-message', {{
@@ -667,13 +636,53 @@ def wrap_page(content, current_user=None):
                     }})
                 }}).then(response => {{
                     if (response.ok) {{
-                        input.value = '';
-                        location.reload();
+                        return response.json();
                     }}
+                    throw new Error('Network response was not ok');
+                }}).then(data => {{
+                    if (data.status === 'success') {{
+                        // Create new message element
+                        const newMessage = document.createElement('div');
+                        newMessage.className = 'message-container';
+                        newMessage.innerHTML = `
+                            <div class="message-header">
+                                {session.get('username', 'You')}
+                            </div>
+                            <div class="message-content">${{formatMessage(message)}}</div>
+                            <div class="message-time">${{new Date().toISOString()}}</div>
+                        `;
+                        
+                        // Add separator if there are existing messages
+                        if (messagesDiv.children.length > 0) {{
+                            const separator = document.createElement('div');
+                            separator.className = 'separator';
+                            messagesDiv.appendChild(separator);
+                        }}
+                        
+                        // Add new message
+                        messagesDiv.appendChild(newMessage);
+                        
+                        // Format timestamp and scroll to bottom
+                        formatTimestamps();
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        
+                        // Clear input
+                        input.value = '';
+                    }}
+                }}).catch(error => {{
+                    console.error('Error:', error);
                 }});
             }}
         }}
         
+        function formatMessage(text) {{
+            // Simple formatting - replace with more robust parser if needed
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }}
+
         function startPrivateChat(email) {{
             // In a real app, you would navigate to a private chat view
             alert('Starting private chat with user: ' + email);
@@ -703,6 +712,7 @@ def index():
         user = get_user_by_email(message['author'])
         message['author'] = user['username'] if user else 'Unknown'
         message['content'] = format_message(message['content'])
+        message['timestamp'] = format_time(message['timestamp'])
     
     content = f"""
 <div class="chat-container">
@@ -725,13 +735,13 @@ def index():
             <div class="message-container">
                 <div class="message-header">
                     {message['author']}
-                    {'<span class="message-edited">Edited</span>' if message['edited'] else ''}
+                    {'<span class="message-edited">Edited</span>' if message.get('edited', False) else ''}
                 </div>
                 <div class="message-content">{message['content']}</div>
-                <div class="message-time">{message['timestamp']|format_time}</div>
+                <div class="message-time">{message['timestamp']}</div>
             </div>
-            {'<div class="separator"></div>' if not loop.last else ''}
-            ''' for message in messages])}
+            {'<div class="separator"></div>' if i < len(messages)-1 else ''}
+            ''' for i, message in enumerate(messages)])}
         </div>
         
         <div class="formatting-buttons">
@@ -746,7 +756,7 @@ def index():
     </div>
 </div>
 """
-    return render_template_string(wrap_page(content, current_user))
+    return render_template_string(base_html(content))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -787,7 +797,7 @@ def login():
     </div>
 </div>
 """
-    return render_template_string(wrap_page(content))
+    return render_template_string(base_html(content))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -865,7 +875,7 @@ def register():
     </div>
 </div>
 """
-    return render_template_string(wrap_page(content))
+    return render_template_string(base_html(content))
 
 @app.route('/logout')
 def logout():
@@ -917,7 +927,7 @@ def settings():
     </form>
 </div>
 """
-    return render_template_string(wrap_page(content, current_user))
+    return render_template_string(base_html(content))
 
 @app.route('/update-profile', methods=['POST'])
 def update_profile():
@@ -1025,7 +1035,7 @@ def info():
     </ul>
 </div>
 """
-    return render_template_string(wrap_page(content))
+    return render_template_string(base_html(content))
 
 @app.route('/pfp/<filename>')
 def serve_pfp(filename):
@@ -1061,7 +1071,14 @@ def send_message():
     else:
         add_public_message(message)
     
-    return jsonify({'status': 'success'})
+    return jsonify({
+        'status': 'success',
+        'message': {
+            'author': user['username'],
+            'content': format_message(content),
+            'timestamp': format_time(message['timestamp'])
+        }
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
