@@ -1,2 +1,5 @@
 waitress
 flask
+requests
+pillow
+werkzeug
